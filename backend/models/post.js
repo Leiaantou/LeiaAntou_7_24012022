@@ -16,13 +16,6 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: "CASCADE",
       });
       models.Comment.belongsTo(models.Post, { foreignKey: "Post_id" });
-
-      models.Post.hasMany(models.Comments, {
-        foreignKey: "Post_id",
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
-      });
-      models.Comments.belongsTo(models.Post, { foreignKey: "Post_id" });
     }
   }
   Post.init(
