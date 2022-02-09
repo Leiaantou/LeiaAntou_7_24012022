@@ -2,6 +2,7 @@ const models = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const passwordValidator = require("password-validator");
+const fs = require("fs");
 
 const passwordSchema = new passwordValidator();
 passwordSchema
@@ -104,27 +105,39 @@ exports.login = (req, res, next) => {
     .catch((error) => res.status(500).json({ message: error.message }));
 };
 
+/* Afficher tous les utilisateurs */
+exports.getAllUsers = (req, res, next) => {
+  models.User.findAll()
+    .then((users) => res.status(200).json(users))
+    .catch((error) => res.status(400).json({ error }));
+};
+
+/* Afficher un utilisateur */
+exports.getOneUser = (req, res, next) => {
+  models.User.findOne({ where: { id: req.params.id } })
+    .then((user) => res.status(200).json(user))
+    .catch((error) => res.status(404).json({ error }));
+};
+
 /* Modification du profil utilisateur */
 exports.modifyUser = (req, res, next) => {};
 
 /* Suppresion du profil utilisateur */
+
 exports.deleteUser = (req, res, next) => {
-  //   if (userId != req.auth.userId) {
-  //     return res
-  //       .status(403)
-  //       .json({ message: "Vous n'êtes pas autorisé à supprimer ce compte !" });
-  //   }
-  //   models.User.destroy({ where: { id: req.params.id } })
-  //     .then(() => res.status(200).json({ message: "Ce compte a été supprimé" }))
-  //     .catch((error) => res.status(500).json(error));
+  models.User.findOne({ where: { id: req.params.id } })
+    .then((user) => {
+      if (user.userId !== req.auth.userId) {
+        res
+          .status(403)
+          .json({ error: "Vous n'êtes pas autorisé à supprimer ce compte !" });
+      } else if (user.userId == req.auth.userId) {
+        models.User.deleteOne({ where: { id: req.params.id } })
+          .then(() =>
+            res.status(200).json({ message: "Ce compte a été supprimé !" })
+          )
+          .catch((error) => res.status(400).json({ error }));
+      }
+    })
+    .catch((error) => res.status(500).json({ error }));
 };
-
-/* Afficher tous les utilisateurs */
-exports.getAllUsers = (req, res, next) => {
-  //   models.User.findAll()
-  //     .then((users) => res.status(200).json(users))
-  //     .catch((error) => res.status(400).json({ error }));
-};
-
-/* Afficher un utilisateur */
-exports.getOneUser = (req, res, next) => {};
