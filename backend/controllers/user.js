@@ -59,7 +59,7 @@ exports.signup = (req, res, next) => {
             email: req.body.email,
             password: hash,
             service: req.body.service,
-            isAdmin: 0,
+            isAdmin: req.body.isAdmin,
           };
           models.User.create(UserObject).then((result) => {
             res.status(201).json({ message: "Utilisateur créé !" });
@@ -75,6 +75,7 @@ exports.signup = (req, res, next) => {
 };
 
 /* Connexion de l'utilisateur */
+
 exports.login = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -106,6 +107,7 @@ exports.login = (req, res, next) => {
 };
 
 /* Afficher tous les utilisateurs */
+
 exports.getAllUsers = (req, res, next) => {
   models.User.findAll()
     .then((users) => res.status(200).json(users))
@@ -113,6 +115,7 @@ exports.getAllUsers = (req, res, next) => {
 };
 
 /* Afficher un utilisateur */
+
 exports.getOneUser = (req, res, next) => {
   models.User.findOne({ where: { id: req.params.id } })
     .then((user) => res.status(200).json(user))
@@ -120,19 +123,49 @@ exports.getOneUser = (req, res, next) => {
 };
 
 /* Modification du profil utilisateur */
-exports.modifyUser = (req, res, next) => {};
 
-/* Suppresion du profil utilisateur */
+exports.modifyUser = (req, res, next) => {
+  let password;
+  if (req.body.password) {
+    bcrypt.hash(req.body.password, 10).then((hash) => {
+      password = hash;
+    });
+  }
+  const user = {
+    service: req.body.service,
+    password,
+  };
+  if (req.file) {
+    user.avatar = `${req.protocol}://${req.get("host")}/images/users/${
+      req.file.filename
+    }`;
+  }
+  models.User.update(user, {
+    where: { id: req.params.id },
+  })
+    .then((data) => {
+      if (data[0] === 0) {
+        return res.status(404).json({
+          message: "Utilisateur non trouvé",
+        });
+      } else {
+        res.status(200).json({ message: "Profil modifié !" });
+      }
+    })
+    .catch((err) => res.status(500).json({ err }));
+};
+
+/* Suppression du profil utilisateur */
 
 exports.deleteUser = (req, res, next) => {
   models.User.findOne({ where: { id: req.params.id } })
     .then((user) => {
-      if (user.userId !== req.auth.userId) {
+      if (user.dataValues.id !== req.auth.userId) {
         res
           .status(403)
           .json({ error: "Vous n'êtes pas autorisé à supprimer ce compte !" });
-      } else if (user.userId == req.auth.userId) {
-        models.User.deleteOne({ where: { id: req.params.id } })
+      } else {
+        models.User.destroy({ where: { id: req.params.id } })
           .then(() =>
             res.status(200).json({ message: "Ce compte a été supprimé !" })
           )
