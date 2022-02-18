@@ -131,28 +131,42 @@ exports.modifyUser = (req, res, next) => {
       password = hash;
     });
   }
-  const user = {
-    service: req.body.service,
-    password,
-  };
-  if (req.file) {
-    user.avatar = `${req.protocol}://${req.get("host")}/images/users/${
-      req.file.filename
-    }`;
-  }
-  models.User.update(user, {
-    where: { id: req.params.id },
-  })
-    .then((data) => {
-      if (data[0] === 0) {
-        return res.status(404).json({
-          message: "Utilisateur non trouvé",
+  models.User.findOne({ where: { id: req.params.id } })
+    .then((user) => {
+      if (user.dataValues.id !== req.auth.userId) {
+        res.status(403).json({
+          message: "vous n'êtes pas autorisé à modifier ce profil",
         });
       } else {
-        res.status(200).json({ message: "Profil modifié !" });
+        const userObject = {
+          userId: user.id,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          avatar: user.avatar,
+          service: req.body.service,
+          password,
+        };
+
+        if (req.file) {
+          if (user.avatar) {
+            console.log(user.avatar);
+            fs.unlink(`images/users/${user.avatar}`, () => {});
+          }
+          userObject.avatar = req.file.filename;
+        }
+
+        user
+          .update(userObject)
+          .then(() =>
+            res.status(200).json({
+              user: userObject,
+              message: " Profil modifié !",
+            })
+          )
+          .catch((error) => res.status(400).json(error));
       }
     })
-    .catch((err) => res.status(500).json({ err }));
+    .catch((error) => res.status(500).json({ error }));
 };
 
 /* Suppression du profil utilisateur */

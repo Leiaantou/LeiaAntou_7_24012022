@@ -7,7 +7,7 @@ exports.createComment = (req, res, next) => {
   const commentObject = {
     User_id: req.auth.userId,
     content: req.body.content,
-    Post_id: req.body.postId,
+    Post_id: req.body.Post_id,
   };
 
   if (req.file) {
