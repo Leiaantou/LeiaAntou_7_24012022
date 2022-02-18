@@ -35,5 +35,17 @@ const storagePosts = multer.diskStorage({
   },
 });
 
+const storageComments = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, "images/comments");
+  },
+  filename: (req, file, callback) => {
+    const name = file.originalname.split(".")[0].split(" ").join("_");
+    const extension = MIME_TYPES_POST[file.mimetype];
+    callback(null, name + Date.now() + "." + extension);
+  },
+});
+
 exports.users = multer({ storage: storageUsers }).single("image");
 exports.posts = multer({ storage: storagePosts }).single("image");
+exports.comments = multer({ storage: storageComments }).single("image");

@@ -7,9 +7,15 @@ exports.createPost = (req, res, next) => {
   const postObject = {
     User_id: req.auth.userId,
     content: req.body.content,
-    image: req.file.filename,
   };
 
+  if (req.file) {
+    postObject.image = req.file.filename;
+  }
+  if (req.body.content == undefined && req.file == undefined) {
+    return res.status(400).json({ message: "Votre publication est vide !" });
+  }
+  console.log(postObject);
   models.Post.create(postObject)
 
     .then(() => res.status(201).json({ message: "Post publié !" }))
@@ -61,7 +67,7 @@ exports.modifyPost = (req, res, next) => {
 exports.getAllPosts = (req, res, next) => {
   models.Post.findAll({
     order: [["createdAt", "DESC"]],
-    attributes: ["id", "content", "image"],
+    attributes: ["id", "User_id", "content", "image"],
     include: [
       {
         model: models.User,
@@ -69,7 +75,7 @@ exports.getAllPosts = (req, res, next) => {
       },
       {
         model: models.Comment,
-        attributes: ["id", "content", "image"],
+        attributes: ["id", "User_id", "content", "image"],
         include: [
           {
             model: models.User,
@@ -98,6 +104,7 @@ exports.getOnePost = (req, res, next) => {
       },
       {
         model: models.Comment,
+        attributes: ["id", "User_id", "content", "image"],
         include: [
           {
             model: models.User,
