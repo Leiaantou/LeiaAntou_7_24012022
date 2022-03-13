@@ -60,6 +60,7 @@ exports.signup = (req, res, next) => {
             password: hash,
             service: req.body.service,
             isAdmin: req.body.isAdmin,
+            dateOfBirth: req.body.dateOfBirth
           };
           models.User.create(UserObject).then((result) => {
             res.status(201).json({ message: "Utilisateur créé !" });
@@ -95,8 +96,15 @@ exports.login = (req, res, next) => {
         res.status(200).json({
           userId: user.id,
           isAdmin: user.isAdmin,
+          lastName: user.lastName,
+          firstName: user.firstName,
+          email: user.email,
+          service: user.service,
+          dateOfBirth: user.dateOfBirth,
+          avatar: user.avatar,
+          createdAt: user.createdAt,
           token: jwt.sign(
-            { userId: user.id, isAdmin: user.isAdmin },
+            { userId: user.id, lastName: user.lastName, firstName: user.firstName, email: user.email, service: user.service, isAdmin: user.isAdmin, dateOfBirth: user.dateOfBirth, avatar: user.avatar, createdAt: user.createdAt },
             "RANDOM_TOKEN_SECRET",
             { expiresIn: "24h" }
           ),

@@ -67,7 +67,7 @@ exports.modifyPost = (req, res, next) => {
 exports.getAllPosts = (req, res, next) => {
   models.Post.findAll({
     order: [["createdAt", "DESC"]],
-    attributes: ["id", "User_id", "content", "image"],
+    attributes: ["id", "User_id", "content", "image", "createdAt", "updatedAt"],
     include: [
       {
         model: models.User,
@@ -75,7 +75,7 @@ exports.getAllPosts = (req, res, next) => {
       },
       {
         model: models.Comment,
-        attributes: ["id", "User_id", "content", "image"],
+        attributes: ["id", "User_id", "content", "image", "createdAt", "UpdatedAt"],
         include: [
           {
             model: models.User,

@@ -1,0 +1,113 @@
+<template>
+        <div class="createPost jumbotron">
+      <form>
+        <h1>Bonjour {{userData.data.firstName}} 👋 </h1>
+        <div class="form-group">
+          <label for="content"></label>
+          <input v-model="post.content"
+            type="text"
+            class="form-control"
+            placeholder="Quoi de neuf ?"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="image"></label>
+          <input name="image"
+            type="file"
+            class="form-control"
+            id="postFile"
+            accept="image/png, image/jpeg, image/jpg, image/gif" @change="onFileSelected"
+          />
+        </div>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-info" type="submit" @click.prevent="createPost">
+           <fa icon="paper-plane" />
+          </button>
+        </div>
+        <span id='msgError' class="mx-3 text-danger">{{msgError}}</span>
+      </form>
+    </div>
+</template>
+
+<script>
+import axios from "axios";
+export default {
+    name: "CreatePost",
+    data(){
+        return{
+userData: {data: {}},
+            post:{
+                content:"",
+                image:""
+            },
+            msgError:"",
+            msgWelcome:""
+        }
+    },
+
+    mounted() {
+    this.createUserData(), 
+    this.getAllPosts()
+  },
+
+  methods: {
+
+
+                getAllPosts() {
+      axios
+        .get("http://localhost:3000/api/post/")
+        .then((response) => {
+          if (response.data.length > 0) {
+            this.allPosts = response.data;
+            console.log(this.allPosts);
+          } else {
+            console.log("Il n'y a pas encore de publication.");
+          }
+        })
+        .catch((error) =>
+          console.log(error + "Echec lors de la récupération des publications.")
+        );
+    },
+        createUserData() {
+      if (localStorage.getItem("user")) {
+        try {
+          this.userData = JSON.parse(localStorage.getItem("user"));
+        } catch(e) {
+          localStorage.removeItem("user");
+          console.log("Données corrompues");
+        }
+      }
+    },
+    onFileSelected(event){
+             console.log(event);
+      this.post.image = event.target.files[0] || event.dataTransfer.files;
+      console.log(this.post.image);
+    },
+      createPost(){
+          console.log(this.post);
+          const fd = new FormData();
+          fd.append("content", this.post.content);
+          fd.append("image", this.post.image);
+          console.log("test", fd.get("content"));
+          console.log("test", fd.get("image"));
+          if (fd.get("content") == null && fd.get("image") == null || fd.get("content") == "" && fd.get("image") == ""){
+        let msgReturn = document.getElementById('msgError')
+        msgReturn.classList.add('text-danger')
+        this.msgError = "Rien à publier";
+      } else {
+                axios
+        .post("http://localhost:3000/api/post/", fd, {
+            headers: {
+              Authorization: `Bearer: ${this.userData.data.token}`}
+            })
+        .then(() => {
+          this.post.content = "";
+          this.post.image = "";
+         location.reload()
+        })
+        .catch(error => console.log(error));
+      }}
+  }
+}
+</script>
