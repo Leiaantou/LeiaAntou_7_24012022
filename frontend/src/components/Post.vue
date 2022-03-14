@@ -1,6 +1,7 @@
 <template>
   <div>
     <CreatePost />
+    <modale :revele="revele" :post="post" :toggleModale="toggleModale"></modale>
     <article
       class="jumbotron post"
       v-for="post in allPosts"
@@ -34,8 +35,9 @@
       </div>
       <!-- si c'est l'user qui a publié -->
       <div class="d-flex justify-content-end mt-3">
-        <modale :revele="revele" :post="post" :toggleModale="toggleModale"></modale>
-        <button class="btn btn-info mr-2" v-on:click="toggleModale()">
+      
+        
+        <button class="btn btn-info mr-2" v-on:click="toggleModale(post)">
           <fa icon="pencil" />
         </button>
         <button class="btn btn-danger" @click="deletePost(post.id)">
@@ -129,8 +131,7 @@
             />
           </div>
           <div class="d-flex justify-content-end mt-3">
-            <modale :revele="revele" :toggleModale="toggleModale"></modale>
-            <button class="btn btn-info mr-2" v-on:click="toggleModale">
+            <button class="btn btn-info mr-2">
               <fa icon="pencil" />
             </button>
             <button

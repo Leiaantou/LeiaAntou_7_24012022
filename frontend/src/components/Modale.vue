@@ -4,19 +4,31 @@
 
     <div class="modale card">
       <div v-on:click="toggleModale" class="btn-modale btn btn-danger">X</div>
-      <h2>Modification de votre post</h2>
-      <p> {{post.id}} {{post.content}} </p>
-      <article>
+      <h2 class="text-center">Modification de votre publication</h2> 
+      <div class="d-flex">
+      <p class="mr-5"> Texte d'origine :</p>
+      <p v-if="post.content"> {{post.content}} </p>
+      <p v-else> Votre publication ne contenait pas de texte</p>  
+      </div>
       <div class="form-group">
           <label for="content"></label>
-          <textarea rows="5" class="form-control" :value="post.content"></textarea>
+          <textarea rows="5" cols="7" class="form-control" v-model="postModified.content"></textarea>
+      </div>
+      <div class="d-flex flex-row align-items-center mb-3">
+      <p class="mr-5">Image d'origine :</p>
+      <img class="preview" v-if="post.image != null" :src="
+                  require(`../../../backend/images/posts/${post.image}`)
+                "/>
+                <p v-else> Votre publication ne contenait pas d'image</p>
       </div>
       <div class="form-control">
           <label for="image"></label>
-          <input type="file" class="form-class"/>
+          <input type="file" name="image" accept="image/png, image/jpeg, image/jpg, image/gif" class="form-class" @change="onFileSelected"/>
+          
       </div>
-      <button class="btn btn-info" @click="editPost(post.id)"><fa icon="paper-plane" /></button>
-    </article>
+      <div class="submit_new_post d-flex justify-content-end mt-2">
+      <button class="btn btn-info" @click="editPost(post.id)" v-on:click="toggleModale"><fa icon="paper-plane" /></button>
+      </div>
       </div>
   </div>
 </template>
@@ -30,28 +42,46 @@ export default {
       return{
           userData: { data: {} },
           postData: { data: {}},
+          postModified:{},
       }
   },
   mounted(){
       this.createUserData(),
-      this.getOnePost()
+      // this.getOnePost()
+      this.getAllPosts()
 
   },
+
   methods: {
 
-    getOnePost() {
-                    axios.get("http://localhost:3000/api/post/",{        
-                    headers: {
-            Authorization: `Bearer: ${this.userData.data.token}`,
+    getAllPosts() {
+      axios
+        .get("http://localhost:3000/api/post/")
+        .then((response) => {
+          if (response.data.length > 0) {
+            this.allPosts = response.data;
+            console.log(response);
+          } else {
+            console.log("Il n'y a pas encore de publication.");
           }
-                    })
-          .then(response => {
-          localStorage.setItem("post",JSON.stringify(response));
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        })
+        .catch((error) =>
+          console.log(error + "Echec lors de la récupération des publications.")
+        );
     },
+    // getOnePost() {
+    //                 axios.get("http://localhost:3000/api/post/",{        
+    //                 headers: {
+    //         Authorization: `Bearer: ${this.userData.data.token}`,
+    //       }
+    //                 })
+    //       .then(response => {
+    //       localStorage.setItem("post",JSON.stringify(response));
+    //         })
+    //         .catch(error => {
+    //             console.log(error)
+    //         })
+    // },
 
         createUserData() {
       if (localStorage.getItem("user")) {
@@ -64,8 +94,31 @@ export default {
       }
     },
 
-    editPost(){
-        console.log(this.post);
+    onFileSelected(event){
+             console.log(event);
+      this.postModified.image = event.target.files[0] || event.dataTransfer.files;
+      console.log(this.postModified.image);
+    },
+
+    editPost(postId){
+        console.log(postId);
+              let formData = new FormData();
+      if(this.postModified.content) {
+        formData.append('content', this.postModified.content);
+      }
+      if(this.postModified.image) {
+        formData.append('image', this.postModified.image);
+      }
+                console.log("test", formData.get("content"));
+          console.log("test", formData.get("image"));
+      axios
+          .put("http://localhost:3000/api/post/" + postId, formData , { headers: {
+              authorization: `Bearer: ${this.userData.data.token}` }})
+          .then(() => {
+            this.postModified = "";
+           this.getAllPosts()
+          })
+          .catch(error => console.log(error))   
     }
   },
 };
@@ -98,12 +151,16 @@ export default {
   color: #333;
   padding: 50px;
   position: fixed;
-  top: 30%;
+  width: 60%;
 }
 
 .btn-modale {
   position: absolute;
   top: 10px;
   right: 10px;
+}
+
+.preview{
+  width: 15%;
 }
 </style>
