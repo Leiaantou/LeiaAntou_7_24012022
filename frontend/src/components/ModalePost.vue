@@ -1,9 +1,10 @@
 <template>
-  <div class="bloc-modale" v-if="revele">
-    <div class="overlay" v-on:click="toggleModale"></div>
+  <div class="bloc-modale" v-if="revelePost">
+    <div class="overlay" v-on:click="toggleModalePost"></div>
 
     <div class="modale card">
-      <div v-on:click="toggleModale" class="btn-modale btn btn-danger">X</div>
+      <div v-on:click="toggleModalePost
+" class="btn-modale btn btn-danger">X</div>
       <h2 class="text-center">Modification de votre publication</h2> 
       <div class="d-flex">
       <p class="mr-5"> Texte d'origine :</p>
@@ -12,7 +13,7 @@
       </div>
       <div class="form-group">
           <label for="content"></label>
-          <textarea rows="5" cols="7" class="form-control" v-model="postModified.content"></textarea>
+          <textarea rows="5" class="form-control" v-model="postModified.content"></textarea>
       </div>
       <div class="d-flex flex-row align-items-center mb-3">
       <p class="mr-5">Image d'origine :</p>
@@ -27,7 +28,8 @@
           
       </div>
       <div class="submit_new_post d-flex justify-content-end mt-2">
-      <button class="btn btn-info" @click="editPost(post.id)" v-on:click="toggleModale"><fa icon="paper-plane" /></button>
+      <button class="btn btn-info" @click="editPost(post.id)" v-on:click="toggleModalePost
+"><fa icon="paper-plane" /></button>
       </div>
       </div>
   </div>
@@ -36,18 +38,18 @@
 <script>
 import axios from 'axios'
 export default {
-  name: "Modale",
-  props: ["revele", "toggleModale", "post"],
+  name: "ModalePost",
+  props: ["revelePost", "toggleModalePost", "post"],
   data() {
       return{
           userData: { data: {} },
           postData: { data: {}},
+          allPosts:[],
           postModified:{},
       }
   },
   mounted(){
       this.createUserData(),
-      // this.getOnePost()
       this.getAllPosts()
 
   },
@@ -69,19 +71,6 @@ export default {
           console.log(error + "Echec lors de la récupération des publications.")
         );
     },
-    // getOnePost() {
-    //                 axios.get("http://localhost:3000/api/post/",{        
-    //                 headers: {
-    //         Authorization: `Bearer: ${this.userData.data.token}`,
-    //       }
-    //                 })
-    //       .then(response => {
-    //       localStorage.setItem("post",JSON.stringify(response));
-    //         })
-    //         .catch(error => {
-    //             console.log(error)
-    //         })
-    // },
 
         createUserData() {
       if (localStorage.getItem("user")) {
@@ -162,5 +151,8 @@ export default {
 
 .preview{
   width: 15%;
+}
+.btn-info{
+  background-color: #034E6F;
 }
 </style>

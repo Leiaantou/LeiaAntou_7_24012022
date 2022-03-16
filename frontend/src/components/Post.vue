@@ -1,9 +1,10 @@
 <template>
   <div>
-    <CreatePost />
-    <modale :revele="revele" :post="post" :toggleModale="toggleModale"></modale>
-    <article
-      class="jumbotron post"
+    <CreatePost class="pb-0" />
+    <ModalePost :revelePost="revelePost" :post="post" :toggleModalePost="toggleModalePost"></ModalePost>
+    <ModaleComment :reveleComment="reveleComment" :comment="comment" :toggleModaleComment="toggleModaleComment"></ModaleComment>
+    <article rows="7"
+      class="jumbotron post pt-3 pb-2"
       v-for="post in allPosts"
       v-bind:key="post.id"
     >
@@ -15,8 +16,8 @@
           />
         </div>
         <div class="d-flex flex-column">
-          <h3>{{ post.User.lastName }} {{ post.User.firstName }}</h3>
-          <p>
+          <h4>{{ post.User.lastName }} {{ post.User.firstName }}</h4>
+          <p class="createdAt">
             créé le
             {{
               post.createdAt.split("T")[0].split("-").reverse().join("/") +
@@ -26,21 +27,23 @@
           </p>
         </div>
       </div>
-      <div>{{ post.content }}</div>
+      <div class="post_container">
+      <div class="post_content">{{ post.content }}</div>
       <div v-if="post.image" class="d-flex justify-content-center">
         <img
           class="post_image"
           :src="require(`../../../backend/images/posts/${post.image}`)"
         />
       </div>
+      </div>
       <!-- si c'est l'user qui a publié -->
       <div class="d-flex justify-content-end mt-3">
       
         
-        <button class="btn btn-info mr-2" v-on:click="toggleModale(post)">
+        <button class="btn btn-info mr-2" v-if="userData.data.userId == post.User_id" v-on:click="toggleModalePost(post)">
           <fa icon="pencil" />
         </button>
-        <button class="btn btn-danger" @click="deletePost(post.id)">
+        <button class="btn btn-danger" v-if="userData.data.userId == post.User_id" @click="deletePost(post.id)">
           <fa icon="trash-can" />
         </button>
         <button class="btn btn-info ml-2" @click="commentForm = !commentForm">
@@ -84,7 +87,8 @@
         </form>
       </div>
       <!-- Affichage des commentaires -->
-      <div class="jumbotron comment mt-3" v-if="post.Comments.length >= 1">
+      <h5 v-if="post.Comments.length > 0">Commentaires:</h5>
+      <div class="comment mt-3" v-if="post.Comments.length >= 1">
         <div v-for="comment in post.Comments" v-bind:key="comment.id">
           <div class="comment_user d-flex flex-row align-items-baseline">
             <div>
@@ -101,9 +105,23 @@
                 src="../assets/avatar.png"
               />
             </div>
-            <div class="d-flex flex-column">
-              <h3>{{ comment.User.lastName }} {{ comment.User.firstName }}</h3>
-              <p>
+            <div class="bulle">
+              <h6 class="d-flex flex-column">{{ comment.User.lastName }} {{ comment.User.firstName }}</h6>
+
+            
+          
+          <div class="comment_content">{{ comment.content }}</div>
+          <div class="d-flex justify-content-center" v-if="comment.image" >
+            <img 
+              class="comment_image"
+              :src="
+                require(`../../../backend/images/comments/${comment.image}`)
+              "
+            />
+            </div>
+          </div>
+        </div>
+                        <p class="createdAt font-italic">
                 créé le
                 {{
                   comment.createdAt
@@ -119,30 +137,19 @@
                     .join(":")
                 }}
               </p>
-            </div>
-          </div>
-          <div>{{ comment.content }}</div>
-          <div v-if="comment.image" class="d-flex justify-content-center">
-            <img
-              class="comment_image"
-              :src="
-                require(`../../../backend/images/comments/${comment.image}`)
-              "
-            />
-          </div>
           <div class="d-flex justify-content-end mt-3">
-            <button class="btn btn-info mr-2">
+            <button class="button_comment btn btn-info btn-sm mr-2" v-if="userData.data.userId == comment.User_id" v-on:click="toggleModaleComment(comment)">
               <fa icon="pencil" />
             </button>
             <button
-              class="btn btn-danger mr-2"
+              class="button_comment btn btn-danger btn-sm mr-2" v-if="userData.data.userId == comment.User_id"
               @click="deleteComment(comment.id)"
             >
               <fa icon="trash-can" />
             </button>
-            <button class="btn btn-info"><fa icon="thumbs-up" /></button>
+            <!-- <button class="btn btn-info"><fa icon="thumbs-up" /></button> -->
           </div>
-          <hr />
+        
         </div>
       </div>
     </article>
@@ -152,17 +159,20 @@
 <script>
 import axios from "axios";
 import CreatePost from "../components/CreatePost.vue";
-import Modale from "../components/Modale.vue";
+import ModalePost from "../components/ModalePost.vue";
+import ModaleComment from "../components/ModaleComment.vue";
 
 export default {
   name: "Post",
   components: {
     CreatePost,
-    Modale,
+    ModalePost,
+    ModaleComment
   },
   data() {
     return {
-      revele: false,
+      reveleComment: false,
+      revelePost: false,
       commentForm: false,
       userData: { data: {} },
       user: {
@@ -177,6 +187,7 @@ export default {
         image: "",
         userId: "",
         createdAt: "",
+        updatedAt:""
       },
 
       comment: {
@@ -186,6 +197,7 @@ export default {
         userId: "",
         createdAt: "",
         postId: "",
+        updatedAt:""
       },
 
       allPosts: [],
@@ -225,9 +237,13 @@ export default {
         }
       }
     },
-    toggleModale(post) {
+    toggleModalePost(post) {
       this.post = post;
-      this.revele = !this.revele;
+      this.revelePost = !this.revelePost;
+    },
+    toggleModaleComment(comment) {
+      this.comment = comment;
+      this.reveleComment = !this.reveleComment;
     },
     modifyPost() {},
     deletePost(postId) {
@@ -299,20 +315,25 @@ export default {
 </script>
 
 <style scoped>
-.post_user_avatar,
-.comment_user_avatar {
-  width: 80px;
-  height: 80px;
+.post_user_avatar {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border: 2px double #0582ba;
+  border: 2px double #034E6F;
+   object-fit: cover;
 }
-img {
-  object-fit: contain;
+
+.comment_user_avatar {
+    width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px double white;
+  object-fit: cover;
 }
+
 .post_image {
   object-fit: contain;
-  width: 100%;
-  height: 30rem;
+  width: 50%;
 }
 
 .comment_image {
@@ -323,11 +344,31 @@ img {
   color: black;
 }
 
-.post {
+/* .post {
   background-color: #0582ba;
+} */
+/* .post_container{
+  background-color: bisque;
+  } */
+  .post_content{
+    font-size: 20px;
+  }
+.bulle {
+    background-color: #034E6F;
+    border-radius: 20px;
+    padding: 15px;
+    border: 2px solid white;
+    color: white;
 }
-
-.comment {
-  background-color: aliceblue;
+.comment_content{
+  font-size: 20px;
+}
+p.createdAt {
+    font-size: 10px;
+    text-align: end;
+    margin-top: -8px;
+}
+.btn-info{
+  background-color: #034E6F;
 }
 </style>

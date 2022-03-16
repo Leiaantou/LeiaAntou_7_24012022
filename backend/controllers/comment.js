@@ -90,7 +90,7 @@ exports.deleteComment = (req, res, next) => {
 exports.getAllComments = (req, res, next) => {
   models.Comment.findAll({
     where: { Post_id: req.params.id },
-    order: [["createdAt", "DESC"]],
+    order: [["createdAt", "ASC"]],
     attributes: ["id", "User_id", "Post_id", "content", "image", "createdAt", "updatedAt"],
     include: [
       {

@@ -1,11 +1,10 @@
 <template>
-        <div class="createPost jumbotron">
+        <div class="createPost jumbotron pb-0">
       <form>
-        <h1>Bonjour {{userData.data.firstName}} 👋 </h1>
+        <h2>Bonjour {{userData.data.firstName}} 👋 </h2>
         <div class="form-group">
           <label for="content"></label>
-          <input v-model="post.content"
-            type="text"
+          <textarea rows="5" v-model="post.content"
             class="form-control"
             placeholder="Quoi de neuf ?"
           />
@@ -111,3 +110,8 @@ userData: {data: {}},
   }
 }
 </script>
+<style scoped>
+.btn-info{
+  background-color: #034E6F;
+}
+</style>

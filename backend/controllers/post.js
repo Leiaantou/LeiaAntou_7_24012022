@@ -96,7 +96,7 @@ exports.getAllPosts = (req, res, next) => {
 exports.getOnePost = (req, res, next) => {
   models.Post.findOne({
     where: { id: req.params.id },
-    attributes: ["id", "User_id", "content", "image"],
+    attributes: ["id", "User_id", "content", "image", "createdAt", "updatedAt"],
     include: [
       {
         model: models.User,
@@ -104,7 +104,7 @@ exports.getOnePost = (req, res, next) => {
       },
       {
         model: models.Comment,
-        attributes: ["id", "User_id", "content", "image"],
+        attributes: ["id", "User_id", "content", "image", "createdAt", "updatedAt"],
         include: [
           {
             model: models.User,

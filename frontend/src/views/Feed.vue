@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <header>
-      <nav class="d-flex flex-row justify-content-around align-items-center">
+      <nav class="d-flex flex-row justify-content-between align-items-center">
         <div class="logo_brand d-flex flex-row">
           <img class="logo_navbar" src="../assets/essaifavicon.png" alt="" />
           <h1>Groupomania</h1>
@@ -18,7 +18,7 @@
               <router-link to="/profile"><fa icon="user" /></router-link>
             </li>
             <li>
-              <router-link to="/"><fa icon="right-from-bracket"/></router-link>
+              <router-link class="deconnexion" to="/"><fa icon="right-from-bracket"/></router-link>
             </li>
           </ul>
         </div>
@@ -61,22 +61,20 @@ export default {
   width: 50px;
 }
 
-.logo_brand {
-  margin-right: 8rem;
-}
+
 
 h1 {
-  color: #0582ba;
+  color: #034e6f;
   font-size: 25px;
   padding-top: 10px;
 }
 
 nav {
-  background-color: lightskyblue;
   height: 50px;
 }
 a{
-  color: #0582ba;
+  color: #034e6f;
+  font-size: larger;
 }
 ul {
   list-style: none;
@@ -88,6 +86,15 @@ li {
 }
 
 icon {
-  color: #0582ba;
+  color: #034e6f;
+}
+.deconnexion{
+  color: red;
+}
+
+@media screen and (max-width: 768px) {
+  h1{
+    display: none;
+  }
 }
 </style>
