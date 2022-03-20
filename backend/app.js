@@ -1,6 +1,7 @@
 // Imports
 const express = require("express");
 const path = require("path");
+require("dotenv").config();
 
 const Sequelize = require("sequelize");
 // Express

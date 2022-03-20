@@ -3,59 +3,73 @@
     <div class="overlay" v-on:click="toggleModalePost"></div>
 
     <div class="modale card">
-      <div v-on:click="toggleModalePost
-" class="btn-modale btn btn-danger">X</div>
-      <h2 class="text-center">Modification de votre publication</h2> 
+      <div v-on:click="toggleModalePost" class="btn-modale btn btn-danger">
+        X
+      </div>
+      <h2 class="text-center">Modification de votre publication</h2>
       <div class="d-flex">
-      <p class="mr-5"> Texte d'origine :</p>
-      <p v-if="post.content"> {{post.content}} </p>
-      <p v-else> Votre publication ne contenait pas de texte</p>  
+        <p class="mr-5">Texte d'origine :</p>
+        <p v-if="post.content">{{ post.content }}</p>
+        <p v-else>Votre publication ne contenait pas de texte</p>
       </div>
       <div class="form-group">
-          <label for="content"></label>
-          <textarea rows="5" class="form-control" v-model="postModified.content"></textarea>
+        <label for="content"></label>
+        <textarea
+          rows="5"
+          class="form-control"
+          v-model="postModified.content"
+        ></textarea>
       </div>
       <div class="d-flex flex-row align-items-center mb-3">
-      <p class="mr-5">Image d'origine :</p>
-      <img class="preview" v-if="post.image != null" :src="
-                  require(`../../../backend/images/posts/${post.image}`)
-                "/>
-                <p v-else> Votre publication ne contenait pas d'image</p>
+        <p class="mr-5">Image d'origine :</p>
+        <img
+          class="preview"
+          v-if="post.image != null"
+          :src="require(`../../../backend/images/posts/${post.image}`)"
+        />
+        <p v-else>Votre publication ne contenait pas d'image</p>
       </div>
       <div class="form-control">
-          <label for="image"></label>
-          <input type="file" name="image" accept="image/png, image/jpeg, image/jpg, image/gif" class="form-class" @change="onFileSelected"/>
-          
+        <label for="image"></label>
+        <input
+          type="file"
+          name="image"
+          accept="image/png, image/jpeg, image/jpg, image/gif"
+          class="form-class"
+          @change="onFileSelected"
+        />
       </div>
       <div class="submit_new_post d-flex justify-content-end mt-2">
-      <button class="btn btn-info" @click="editPost(post.id)" v-on:click="toggleModalePost
-"><fa icon="paper-plane" /></button>
+        <button
+          class="btn btn-info"
+          @click="editPost(post.id)"
+          v-on:click="toggleModalePost"
+        >
+          <fa icon="paper-plane" />
+        </button>
       </div>
-      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 export default {
   name: "ModalePost",
   props: ["revelePost", "toggleModalePost", "post"],
   data() {
-      return{
-          userData: { data: {} },
-          postData: { data: {}},
-          allPosts:[],
-          postModified:{},
-      }
+    return {
+      userData: { data: {} },
+      postData: { data: {} },
+      allPosts: [],
+      postModified: {},
+    };
   },
-  mounted(){
-      this.createUserData(),
-      this.getAllPosts()
-
+  mounted() {
+    this.createUserData(), this.getAllPosts();
   },
 
   methods: {
-
     getAllPosts() {
       axios
         .get("http://localhost:3000/api/post/")
@@ -72,10 +86,13 @@ export default {
         );
     },
 
-        createUserData() {
-      if (localStorage.getItem("user")) {
+    createUserData() {
+      const user = localStorage.getItem("user");
+      const token = localStorage.getItem("token");
+      if (user) {
         try {
-          this.userData = JSON.parse(localStorage.getItem("user"));
+          this.userData = JSON.parse(user);
+          this.userData.token = token;
         } catch (e) {
           localStorage.removeItem("user");
           console.log("Données corrompues");
@@ -83,32 +100,36 @@ export default {
       }
     },
 
-    onFileSelected(event){
-             console.log(event);
-      this.postModified.image = event.target.files[0] || event.dataTransfer.files;
+    onFileSelected(event) {
+      console.log(event);
+      this.postModified.image =
+        event.target.files[0] || event.dataTransfer.files;
       console.log(this.postModified.image);
     },
 
-    editPost(postId){
-        console.log(postId);
-              let formData = new FormData();
-      if(this.postModified.content) {
-        formData.append('content', this.postModified.content);
+    editPost(postId) {
+      console.log(postId);
+      let formData = new FormData();
+      if (this.postModified.content) {
+        formData.append("content", this.postModified.content);
       }
-      if(this.postModified.image) {
-        formData.append('image', this.postModified.image);
+      if (this.postModified.image) {
+        formData.append("image", this.postModified.image);
       }
-                console.log("test", formData.get("content"));
-          console.log("test", formData.get("image"));
+      console.log("test", formData.get("content"));
+      console.log("test", formData.get("image"));
       axios
-          .put("http://localhost:3000/api/post/" + postId, formData , { headers: {
-              authorization: `Bearer: ${this.userData.data.token}` }})
-          .then(() => {
-            this.postModified = "";
-           this.getAllPosts()
-          })
-          .catch(error => console.log(error))   
-    }
+        .put("post/" + postId, formData, {
+          headers: {
+            authorization: `Bearer: ${this.token}`,
+          },
+        })
+        .then(() => {
+          this.postModified = "";
+          this.getAllPosts();
+        })
+        .catch((error) => console.log(error));
+    },
   },
 };
 </script>
@@ -149,10 +170,11 @@ export default {
   right: 10px;
 }
 
-.preview{
+.preview {
   width: 15%;
 }
-.btn-info{
-  background-color: #034E6F;
+.btn-info {
+  background-color: #034e6f;
+  border-color: #034e6f;
 }
 </style>

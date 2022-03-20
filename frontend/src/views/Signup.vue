@@ -1,8 +1,8 @@
 <template>
-  <div class="app">
-    <Header/>
+  <div class="container">
+    <Header />
     <main>
-      <p class="row d-flex justify-content-center text-center">
+      <p class="welcome row d-flex justify-content-center text-center">
         Afin d'accèder au réseau social, merci de complèter les informations
         suivantes
       </p>
@@ -119,20 +119,20 @@
         </div>
       </div>
     </main>
-    <Footer/>
+    <Footer />
   </div>
 </template>
 
 <script>
-import Header from '../components/Header.vue';
-import Footer from '../components/Footer.vue';
+import Header from "../components/Header.vue";
+import Footer from "../components/Footer.vue";
 import axios from "axios";
 
 export default {
   name: "Signup",
   components: {
-Header,
-Footer
+    Header,
+    Footer,
   },
   data() {
     return {
@@ -149,7 +149,7 @@ Footer
   methods: {
     checkDataSignup() {
       const regexEmail = /[a-z0-9]+@groupomania.com/g;
-      const regexPassword = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/g; //(?=.*[*.!@$%^&.?_])
+      const regexPassword = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/g;
       const regexAlpha =
         /^[a-zA-Zçñàéèêëïîôüù][a-zA-Zçñàéèêëïîôüù\- '\\.]{2,25}$/g;
       if (
@@ -171,7 +171,8 @@ Footer
         .post("http://localhost:3000/api/auth/signup", this.dataSignup)
         .then((response) => {
           console.log(response);
-          this.$router.push("/feed");
+          alert("Inscription validée, connectez vous !")
+          this.$router.push("/");
         })
         .catch((error) => console.log(error));
     },
@@ -180,8 +181,20 @@ Footer
 </script>
 
 <style scoped>
-
 .connexion {
   width: 50%;
+}
+.errorMsg {
+  color: red;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    margin-left: 0px;
+  }
+  p.welcome {
+    margin-left: 14px;
+    margin-top: 10px;
+  }
 }
 </style>

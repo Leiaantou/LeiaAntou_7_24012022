@@ -1,38 +1,51 @@
 <template>
-    <nav class="d-flex flex-row justify-content-around align-items-center">
-      <div>
-        <img
-          class="logo"
-          src="../assets/icon-left-font-monochrome-black-removebg.png"
-          alt=""
-        />
-      </div>
-      <div>
-        <ul class="d-flex flex-row">
-          <li><router-link to="/"> Se connecter</router-link></li>
-          <li><router-link to="/Signup">S'inscrire</router-link></li>
-        </ul>
-      </div>
-    </nav>
+  <nav class="d-flex flex-row justify-content-around align-items-center">
+    <div class="logo_brand d-flex flex-row">
+      <img
+        class="logo_navbar"
+        src="../assets/logo.png"
+        alt="logo Groupomania"
+      />
+      <h1>Groupomania</h1>
+    </div>
+    <div>
+      <ul class="d-flex flex-row">
+        <li><router-link to="/"> Se connecter</router-link></li>
+        <li class="signup">
+          <router-link to="/Signup">S'inscrire</router-link>
+        </li>
+      </ul>
+    </div>
+  </nav>
 </template>
 
 <script>
 export default {
-    name: 'Header',
-}
+  name: "Header",
+};
 </script>
 
 <style scoped>
-nav.a {
+a {
   color: black;
 }
 
 nav {
-  background-color: lightskyblue;
+  background-color: #e9ecef;
   height: 50px;
 }
-.logo {
-  height: 150px;
+.logo_navbar {
+  width: 50px;
+}
+
+.logo_brand {
+  margin-right: 8rem;
+}
+
+h1 {
+  color: #034e6f;
+  font-size: 25px;
+  padding-top: 10px;
 }
 
 ul {
@@ -42,5 +55,26 @@ ul {
 
 li {
   margin-left: 40px;
+}
+@media screen and (max-width: 768px) {
+  h1 {
+    display: none;
+  }
+  ul {
+    margin-left: -86px;
+  }
+  li {
+    margin-left: 0px;
+  }
+  .signup {
+    margin-left: 20px;
+  }
+  nav {
+    margin-left: -5px;
+    margin-right: -30px;
+  }
+  p.welcome {
+    margin-left: 2px;
+  }
 }
 </style>

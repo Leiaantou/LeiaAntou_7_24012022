@@ -1,19 +1,18 @@
 <template>
-<div class="row">
-      <p class=" copyright">© Groupomania 2021</p>
-</div>
+  <div class="row">
+    <p class="copyright">© Groupomania 2022 by Leia Antou</p>
+  </div>
 </template>
-
 
 <script>
 export default {
-    name: 'Footer',
-}
+  name: "Footer",
+};
 </script>
 
 <style scoped>
-.copyright{
-    margin-right: auto;
-    margin-left: auto;
+.copyright {
+  margin-right: auto;
+  margin-left: auto;
 }
 </style>
