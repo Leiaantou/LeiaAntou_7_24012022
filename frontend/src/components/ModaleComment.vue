@@ -119,11 +119,12 @@ export default {
       axios
         .put("http://localhost:3000/api/comment/" + commentId, formData, {
           headers: {
-            authorization: `Bearer: ${this.userData.data.token}`,
+            authorization: "Bearer " + localStorage.getItem("token"),
           },
         })
         .then(() => {
           this.commentModified = "";
+          location.reload()
         })
         .catch((error) => console.log(error));
     },

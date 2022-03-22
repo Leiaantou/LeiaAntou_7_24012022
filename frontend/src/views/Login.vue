@@ -29,7 +29,6 @@
           </div>
 
           <button
-            @keydown.enter="login()"
             @click="login()"
             type="button"
             class="col btn btn-success"

@@ -20,7 +20,7 @@
                 placeholder="Doe"
                 aria-describedby="lastName"
                 required
-                aria-required="true"
+                minlength="2"
               />
             </div>
             <div class="form-group">
@@ -33,6 +33,7 @@
                 placeholder="John"
                 required
                 aria-describedby="firstName"
+                minlength="2"
               />
             </div>
             <div class="form-group">
@@ -47,6 +48,7 @@
             </div>
             <div class="form-group">
               <label for="email">Adresse mail</label>
+              <p class="help">(Vous devez utiliser votre email groupomania)</p>
               <input
                 v-model="dataSignup.email"
                 type="email"
@@ -72,6 +74,7 @@
             </div>
             <div class="form-group">
               <label for="password">Mot de passe</label>
+              <p class="help">(entre 8 et 20 caractères, sans espace et au minimum 1 chiffre, 1 minuscule et 1 majuscule)</p>
               <input
                 v-model="dataSignup.password"
                 type="password"
@@ -102,9 +105,10 @@
                 Veuillez confirmer votre mot de passe
               </p>
             </div>
+            <p id="signupError"></p>
 
             <button
-              @click.prevent="signup()"
+              @click="signup()"
               :disabled="checkDataSignup()"
               type="submit"
               class="col btn btn-success mt-5"
@@ -151,19 +155,20 @@ export default {
       const regexEmail = /[a-z0-9]+@groupomania.com/g;
       const regexPassword = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/g;
       const regexAlpha =
-        /^[a-zA-Zçñàéèêëïîôüù][a-zA-Zçñàéèêëïîôüù\- '\\.]{2,25}$/g;
+        /^[a-zA-Zçñàéèêëïîôüù][a-zA-Zçñàéèêëïîôüù\- '\\.]{1,25}$/g;
       if (
-        (this.dataSignup.email !== null ||
-          this.dataSignup.lastName !== null ||
-          this.dataSignup.firstName !== null ||
-          this.dataSignup.service !== null ||
-          this.dataSignup.password !== null) &&
+        this.dataSignup.email !== null &&
+          this.dataSignup.lastName !== null &&
+          this.dataSignup.firstName !== null &&
+          this.dataSignup.service !== null &&
+          this.dataSignup.password !== null &&
         regexPassword.test(this.dataSignup.password) &&
         regexEmail.test(this.dataSignup.email) &&
         regexAlpha.test(this.dataSignup.lastName) &&
         regexAlpha.test(this.dataSignup.firstName)
       )
         return true;
+
     },
 
     signup() {
@@ -174,7 +179,12 @@ export default {
           alert("Inscription validée, connectez vous !")
           this.$router.push("/");
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          console.log(error)
+                    const errorMsg = document.getElementById("signupError");
+          errorMsg.textContent =
+            "Champ(s) manquants ou erronés";
+          });
     },
   },
 };
@@ -186,6 +196,14 @@ export default {
 }
 .errorMsg {
   color: red;
+}
+#signupError{
+  color: red;
+  text-align: center;
+}
+.help{
+  font-size: 10px;
+  margin: 0px;
 }
 
 @media screen and (max-width: 768px) {

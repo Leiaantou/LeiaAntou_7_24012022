@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const passwordValidator = require("password-validator");
 const fs = require("fs");
+const emailValidator = require("email-validator");
 
 const passwordSchema = new passwordValidator();
 passwordSchema
@@ -41,6 +42,11 @@ exports.signup = (req, res, next) => {
     });
   }
 
+  if (!emailValidator.validate(req.body.email)) {
+    return res
+      .status(401)
+      .json({ message: "Veuillez entrer une adresse email valide" });
+  }
   if (!passwordSchema.validate(password)) {
     return res.status(400).json({
       message: "Le mot de passe ne doit pas contenir d'espace et doit avoir une longueur entre 8 et 20 caractères contenant au minimum 1 chiffre, 1 minuscule et 1 majuscule !",

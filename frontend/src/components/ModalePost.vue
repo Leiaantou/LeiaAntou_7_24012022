@@ -119,14 +119,14 @@ export default {
       console.log("test", formData.get("content"));
       console.log("test", formData.get("image"));
       axios
-        .put("post/" + postId, formData, {
+        .put("http://localhost:3000/api/post/" + postId, formData, {
           headers: {
-            authorization: `Bearer: ${this.token}`,
+            authorization: "Bearer " + localStorage.getItem("token"),
           },
         })
         .then(() => {
           this.postModified = "";
-          this.getAllPosts();
+          location.reload();
         })
         .catch((error) => console.log(error));
     },
